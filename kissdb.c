@@ -358,7 +358,7 @@ int mighty_simple_db_set(char *path, char *key, char* value)
                 return ret;
         }
         if (KISSDB_put(&db, key, value)) {
-                printf("KISSDB_put: failed (%"PRIu64")\n", (uint64_t)key);
+                printf("KISSDB_put: failed (%s)\n", key);
                 return 1;
         }
 
@@ -382,7 +382,7 @@ int mighty_simple_db_get(char *path, char *key, char* value)
                 return ret;
         }
         if (KISSDB_get(&db, key, value)) {
-                printf("KISSDB_put: failed (%"PRIu64")\n", (uint64_t)key);
+                printf("KISSDB_put: failed (%s)\n", key);
                 return 1;
         }
 
