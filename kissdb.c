@@ -341,6 +341,58 @@ int KISSDB_Iterator_next(KISSDB_Iterator *dbi,void *kbuf,void *vbuf)
 	return 0;
 }
 
+int mighty_simple_db_set(char *path, char *key, char* value)
+{
+        int ret = -1;
+        KISSDB db;
+
+        if((path == NULL) || (key == NULL) || (value == NULL)) {
+                printf("NULL parameters\r\n");
+                return ret;
+        }
+
+        printf("mighty_simple_db_set: p %s k %s v %s \r\n", path, key, value);
+
+        if (KISSDB_open(&db, path, KISSDB_OPEN_MODE_RWREPLACE, 1024, strlen(key), strlen(value))) {
+                printf("KISSDB_open: failed\n");
+                return ret;
+        }
+        if (KISSDB_put(&db, key, value)) {
+                printf("KISSDB_put: failed (%"PRIu64")\n", (uint64_t)key);
+                return 1;
+        }
+
+        KISSDB_close(&db);
+
+        return ret;
+}
+
+int mighty_simple_db_get(char *path, char *key, char* value)
+{
+        int ret = -1;
+        KISSDB db;
+
+        if((path == NULL) || (key == NULL) || (value == NULL)) {
+                printf("NULL parameters\r\n");
+                return ret;
+        }
+
+        if (KISSDB_open(&db, path, KISSDB_OPEN_MODE_RDONLY, 1024, strlen(key), 1024)) {
+                printf("KISSDB_open: failed\n");
+                return ret;
+        }
+        if (KISSDB_get(&db, key, value)) {
+                printf("KISSDB_put: failed (%"PRIu64")\n", (uint64_t)key);
+                return 1;
+        }
+
+        printf("mighty_simple_db_get: p %s k %s v %s \r\n", path, key, value);
+
+        KISSDB_close(&db);
+
+        return ret;
+}
+
 #ifdef KISSDB_TEST
 
 #include <inttypes.h>
@@ -446,7 +498,17 @@ int main(int argc,char **argv)
 
 	printf("All tests OK!\n");
 
-	return 0;
+	char *path = "mighty.db";
+        char *key = "refresh_token";
+        char *value = "Atzr|IwEBILl1Jy0XJQMvxDi7K_AQpF8SlQzUkyUoHMEDCaZXOgyIXM28NAUn7OOiAbhl37y2kx5k0d2cBaBbTa-kJhB9SiMeXcv7LQhK9xjfh_nd2LgDF9OTd9iU-zs_tjX-yNcISGZepeKcyoZg5gfNRUsL10dzwip6jaYtR9v1ThoKnRBrN6oIGaCI-rumzaD4BZ0BbhvfzV7e5-87lLH6TLDsp-8Oq-6bR-pS9df28pmRWsjY8mPApzRn9WWSW1lOvJYuf6Hi1Oih7-bJqreZFDyK-gs2wRffF_RFF2mqFTywEtWQjQzlCE7OP-VQ9hNOBIX0yYz_w5rPkOryTFo3zqtveFtozFZZ_8zLgd2w8oBpbqfoufzOhkDNNPVxqI_Cu8k-0NMHhyCW7PgHlTntLuyjsnY3hYFklfZJ4JZec9ODCdvzTYYy3qMK0KS70oAyFaqcNmb-ZDiipA5SHO-LaYfMXsyFZiKr1oBWMD86lyfYXUGtO9dTrpOo_M7FY3hDd-P55iPKj49lYzm1hoO5mfhWSy1olwXIBqplfXZ1Sdm_scDcsdLtfCoBCArIn3O5gG0ZImM";
+
+        char r_value[1024];
+
+        int rret = mighty_simple_db_set(path, key, value);
+        rret = mighty_simple_db_get(path, key, r_value);
+
+        return rret;
+	
 }
 
 #endif
